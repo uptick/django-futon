@@ -1,2 +1,2 @@
 include README.md
-recursive-include address/static *
+recursive-include futon/static *
