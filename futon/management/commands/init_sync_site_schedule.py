@@ -9,10 +9,6 @@ class Command(BaseCommand):
     help = 'Initialise site synchronisation schedule.'
 
     def handle(self, *args, **options):
-        try:
-            ptask = PeriodicTask.objects.get(name='futon-schedule')
-        except PeriodicTask.DoesNotExist:
-            ptask = None
-        if not ptask:
-            sched, created = IntervalSchedule.objects.get_or_create(period='seconds', every=30)
-            ptask = PeriodicTask.objects.create(name='futon-schedule', task=sync.name, interval=sched)
+        PeriodicTask.objects.filter(name='futon-schedule').delete()
+        sched, created = IntervalSchedule.objects.get_or_create(period='seconds', every=30)
+        PeriodicTask.objects.create(name='futon-schedule', task=sync.name, interval=sched)
