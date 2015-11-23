@@ -15,10 +15,15 @@ from .requests import fetch, AuthenticationError
 logger = logging.getLogger(__name__)
 
 
+class SiteSyncError(Exception):
+    pass
+
+
 @shared_task
 def sync():
-    with only_one('futon-sync', timeout=10) as lock:
+    with only_one('futon-sync', timeout=60) as lock:
         if not lock:
+            logger.warning('Unable to obtain lock in futon sync.')
             return
 
         for site_name in settings.SYNC_SITES.keys():
@@ -67,7 +72,8 @@ def pull_viewset(site, viewset, endpoint):
             serializer.validated_data['id'] = inst['id']
         obj = serializer.save()
 
-        assert obj.id == inst['id'], 'PKs don\'t match: %d and %d'%(obj.id, inst['id'])
+        if obj.id != inst['id']:
+            raise SiteSyncError(site, 'PKs don\'t match: %d and %d'%(obj.id, inst['id']))
 
         logger.debug('Fetched from %s: %s'%(endpoint, obj))
 

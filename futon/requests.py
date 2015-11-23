@@ -1,3 +1,4 @@
+import six
 import os
 import requests
 from requests_oauthlib import OAuth2Session
@@ -31,7 +32,9 @@ def make_url(site, path):
     :site: the site to append patht o
     :path: the path to convert to an URL
     """
-    return urllib.parse.urljoin(site.domain, path)
+    if not isinstance(site, six.string_types):
+        site = site.domain
+    return urllib.parse.urljoin(site, path)
 
 
 def get_token(site, client_id, force=False):
@@ -52,6 +55,9 @@ def get_token(site, client_id, force=False):
     client_secret = settings.SECRET_KEY
     username = settings.SITE_USERNAMES.get(site.name.lower(), '')
     password = settings.SITE_PASSWORDS.get(site.name.lower(), '')
+    if not username:
+        username = settings.SITE_USERNAMES.get('default', '')
+        password = settings.SITE_PASSWORDS.get('default', '')
 
     # Client key and secret
     secret = client_id + ':' + client_secret
