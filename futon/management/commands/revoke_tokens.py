@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from abas.apps.futon.models import Token
+from futon.models import Token
 
 
 class Command(BaseCommand):

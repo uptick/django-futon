@@ -28,6 +28,7 @@ setup(
         'setuptools',
         'six',
         'requests',
+        'redis',
     ],
     zip_safe=False,
 

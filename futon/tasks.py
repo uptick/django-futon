@@ -8,7 +8,7 @@ from django.http.response import Http404
 from celery import shared_task
 from requests.exceptions import ConnectionError
 
-from abas.utils.only_one import only_one
+from .only_one import only_one
 from .requests import fetch, AuthenticationError
 
 
@@ -27,7 +27,11 @@ def sync():
             return
 
         for site_name in settings.SYNC_SITES.keys():
-            site = Site.objects.get(name__iexact=site_name)
+            try:
+                site = Site.objects.get(name__iexact=site_name)
+            except Site.DoesNotExist:
+                logger.error('Site does not exist: %s'%site_name)
+                continue
             try:
                 sync_site(site)
             except ConnectionError:

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from abas.apps.futon.tasks import sync
+from futon.tasks import sync
 
 
 class Command(BaseCommand):
