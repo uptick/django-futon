@@ -6,12 +6,13 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.http.response import Http404
 from celery import shared_task
+from celery.utils.log import get_task_logger
 from requests.exceptions import ConnectionError
 
 from .requests import fetch, AuthenticationError
 
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
 class SiteSyncError(Exception):
@@ -21,6 +22,7 @@ class SiteSyncError(Exception):
 @shared_task
 def sync():
     logger.debug('Beginning futon site sync.')
+    print('Beginning futon site sync.')
     for site_name in settings.SYNC_SITES.keys():
         try:
             site = Site.objects.get(name__iexact=site_name)
@@ -34,6 +36,7 @@ def sync():
         except AuthenticationError:
             logger.error('Failed to authenticate to site: %s'%site)
     logger.debug('Finished futon site sync.')
+    print('Finished futon site sync.')
 
 
 def sync_site(site):
