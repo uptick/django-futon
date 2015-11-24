@@ -8,7 +8,6 @@ from django.http.response import Http404
 from celery import shared_task
 from requests.exceptions import ConnectionError
 
-from .only_one import only_one
 from .requests import fetch, AuthenticationError
 
 
@@ -21,23 +20,20 @@ class SiteSyncError(Exception):
 
 @shared_task
 def sync():
-    with only_one('futon-sync', timeout=60) as lock:
-        if not lock:
-            logger.warning('Unable to obtain lock in futon sync.')
-            return
-
-        for site_name in settings.SYNC_SITES.keys():
-            try:
-                site = Site.objects.get(name__iexact=site_name)
-            except Site.DoesNotExist:
-                logger.error('Site does not exist: %s'%site_name)
-                continue
-            try:
-                sync_site(site)
-            except ConnectionError:
-                logger.error('Failed to connect to site: %s'%site)
-            except AuthenticationError:
-                logger.error('Failed to authenticate to site: %s'%site)
+    logger.debug('Beginning futon site sync.')
+    for site_name in settings.SYNC_SITES.keys():
+        try:
+            site = Site.objects.get(name__iexact=site_name)
+        except Site.DoesNotExist:
+            logger.error('Site does not exist: %s'%site_name)
+            continue
+        try:
+            sync_site(site)
+        except ConnectionError:
+            logger.error('Failed to connect to site: %s'%site)
+        except AuthenticationError:
+            logger.error('Failed to authenticate to site: %s'%site)
+    logger.debug('Finished futon site sync.')
 
 
 def sync_site(site):
