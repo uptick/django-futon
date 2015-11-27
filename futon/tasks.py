@@ -5,21 +5,18 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.http.response import Http404
-from celery import shared_task
-from celery.utils.log import get_task_logger
 from requests.exceptions import ConnectionError
 
 from .requests import fetch, AuthenticationError
 
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class SiteSyncError(Exception):
     pass
 
 
-@shared_task
 def sync():
     logger.debug('Beginning futon site sync.')
     print('Beginning futon site sync.')
