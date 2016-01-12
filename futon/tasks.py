@@ -19,7 +19,6 @@ class SiteSyncError(Exception):
 
 def sync():
     logger.debug('Beginning futon site sync.')
-    print('Beginning futon site sync.')
     for site_name in settings.SYNC_SITES.keys():
         try:
             site = Site.objects.get(name__iexact=site_name)
@@ -33,7 +32,6 @@ def sync():
         except AuthenticationError:
             logger.error('Failed to authenticate to site: %s'%site)
     logger.debug('Finished futon site sync.')
-    print('Finished futon site sync.')
 
 
 def sync_site(site):

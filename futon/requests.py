@@ -1,17 +1,18 @@
 import six
 import os
-import requests
-from requests_oauthlib import OAuth2Session
 import urllib.parse
 import base64
-from simplejson.scanner import JSONDecodeError
-from requests.exceptions import ConnectionError
 import logging
 
+import requests
+from requests_oauthlib import OAuth2Session
+from simplejson.scanner import JSONDecodeError
+from requests.exceptions import ConnectionError
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore
 
 from .models import Token
+from .credentials import get_credentials
 
 __all__ = ['fetch', 'create', 'update']
 
@@ -53,11 +54,7 @@ def get_token(site, client_id, force=False):
     logger.debug('Requesting a new token.')
 
     client_secret = settings.SECRET_KEY
-    username = settings.SITE_USERNAMES.get(site.name.lower(), '')
-    password = settings.SITE_PASSWORDS.get(site.name.lower(), '')
-    if not username:
-        username = settings.SITE_USERNAMES.get('default', '')
-        password = settings.SITE_PASSWORDS.get('default', '')
+    username, password = get_credentials(site)
 
     # Client key and secret
     secret = client_id + ':' + client_secret
