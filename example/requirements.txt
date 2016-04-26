@@ -1,0 +1,5 @@
+django
+requests-oauthlib
+six
+simplejson
+djangorestframework
