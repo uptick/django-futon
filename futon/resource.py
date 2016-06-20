@@ -2,8 +2,10 @@ import logging
 
 from django.db import models
 from django.contrib.sites.models import Site
+from rq.decorators import job
 
 from .requests import fetch, AuthenticationError
+from .utils import import_class
 
 
 logger = logging.getLogger(__name__)
@@ -89,3 +91,12 @@ class Resource(object):
         for k, v in self.mapping.items():
             mapped_data[v] = data[k]
         return mapped_data
+
+
+@job
+def sync():
+    logger.info('Beginning futon sync')
+    for resource_name in getattr(settings, 'FUTON_RESOURCES', []):
+        resource = import_class(resource_name)
+        resource.sync()
+    logger.info('Finished futon sync')
