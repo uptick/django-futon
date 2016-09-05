@@ -1,15 +1,11 @@
 import six
 import os
 import urllib.parse
-import base64
 import logging
 
 import requests
 from requests_oauthlib import OAuth2Session
-from simplejson.scanner import JSONDecodeError
-from requests.exceptions import ConnectionError
 from django.conf import settings
-from django.contrib.sessions.backends.db import SessionStore
 
 from .models import Token
 from .credentials import get_credentials
