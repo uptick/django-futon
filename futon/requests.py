@@ -1,11 +1,13 @@
 import six
 import os
 import urllib.parse
+import threading
 import logging
 
 import requests
 from requests_oauthlib import OAuth2Session
 from django.conf import settings
+from django.contrib.sites.models import Site
 
 from .models import Token
 from .credentials import get_credentials
@@ -14,10 +16,19 @@ __all__ = ['fetch', 'create', 'update']
 
 
 logger = logging.getLogger(__name__)
+lock = threading.Lock()
 
 
 class AuthenticationError(Exception):
     pass
+
+
+def make_site(site, name=None):
+    if isinstance(site, six.string_types):
+        if not isinstance(name, six.string_types):
+            raise Exception('Must provide a name in addition to a domain.')
+        site, created = Site.objects.get_or_create(domain=site, name=name)
+    return site
 
 
 def make_url(site, path):
@@ -35,6 +46,11 @@ def make_url(site, path):
 
 
 def get_token(site, client_id, force=False):
+    with lock:
+        return _get_token(site, client_id, force=force)
+
+
+def _get_token(site, client_id, force=False):
 
     # request_oauthlib won't let us use http, like we need to in debug mode. Setting
     # this value gets around that.
@@ -53,7 +69,7 @@ def get_token(site, client_id, force=False):
     username, password = get_credentials(site)
 
     # Client key and secret
-    secret = client_id + ':' + client_secret
+#    secret = client_id + ':' + client_secret
     data = {
         'grant_type': 'password',
         'username': username,
@@ -63,7 +79,7 @@ def get_token(site, client_id, force=False):
 
     response = requests.post(url, data=data, auth=(client_id, client_secret))
     if response.status_code != 200:
-        raise AuthenticationError('Failed to authenticate: %s'%response.content)
+        raise AuthenticationError('Failed to authenticate: %s' % response.content)
 
     response_data = response.json()
     token = response_data['access_token']
@@ -84,6 +100,7 @@ def authorise(site, force=False):
 
 
 def execute(site, method, url, *args, **kwargs):
+    site = make_site(site, kwargs.pop('name', None))
     reauth = kwargs.pop('reauth', False)
     hub = authorise(site, reauth)
     call = getattr(hub, method)
@@ -92,7 +109,7 @@ def execute(site, method, url, *args, **kwargs):
     if response.status_code == 403 and not reauth:
         return execute(site, method, url, *args, reauth=True, **kwargs)
 
-    return response.json()
+    return response
 
 
 def fetch(site, path, *args, **kwargs):
@@ -103,7 +120,7 @@ def fetch(site, path, *args, **kwargs):
     :path: the endpoint to access
     """
     url = make_url(site, path)
-    return execute(site, 'get', url)
+    return execute(site, 'get', url, **kwargs)
 
 
 def create(site, path, data, *args, **kwargs):
@@ -115,7 +132,7 @@ def create(site, path, data, *args, **kwargs):
     :data: the data to send
     """
     url = make_url(site, path)
-    return execute(site, 'post', url, data=data)
+    return execute(site, 'post', url, data=data, **kwargs)
 
 
 def update(site, path, data, *args, **kwargs):
@@ -127,4 +144,4 @@ def update(site, path, data, *args, **kwargs):
     :data: the data to send
     """
     url = make_url(site, path)
-    return execute(site, 'patch', url, data=data)
+    return execute(site, 'patch', url, data=data, **kwargs)

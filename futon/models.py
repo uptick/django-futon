@@ -12,10 +12,10 @@ class Token(models.Model):
     :token: the authorization token
     """
 
-    site  = models.ForeignKey(Site, related_name='+')
+    site = models.ForeignKey(Site, related_name='+')
     token = models.CharField(max_length=255)
 
     def __str__(self):
         n_chars = len(self.token)
         n_vis = 0 if (n_chars < 5) else 5
-        return self.token[:n_vis] + '*'*(n_chars - n_vis)
+        return self.token[:n_vis] + '*' * (n_chars - n_vis)
