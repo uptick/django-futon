@@ -1,13 +1,11 @@
 import importlib
 import logging
 
-from django.apps import apps
 from django.conf import settings
-from django.contrib.sites.models import Site
-from django.http.response import Http404
 from requests.exceptions import ConnectionError
 
 from .requests import fetch, AuthenticationError
+from .models import Site
 
 
 logger = logging.getLogger(__name__)
