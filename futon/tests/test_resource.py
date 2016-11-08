@@ -1,10 +1,9 @@
 from unittest.mock import patch
 
 from django.test import SimpleTestCase, TestCase
-from django.contrib.sites.models import Site
 from rest_framework.serializers import ModelSerializer
 
-from ..models import Token
+from ..models import Token, Site
 from ..resource import Resource
 
 

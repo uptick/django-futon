@@ -1,12 +1,24 @@
 from django.db import models
-from django.contrib.sites.models import Site
+
+
+class Site(models.Model):
+    """A destination site.
+
+    Don't use Django sites. It's a pain in the ass.
+    """
+
+    name = models.CharField(max_length=200)
+    domain = models.URLField()
+
+    def __str__(self):
+        return self.name
 
 
 class Token(models.Model):
     """An authorization token.
 
-    Once the application has been logged in we need to store the token persistently.
-    When the token expires we replace it in the database.
+    Once the application has been logged in we need to store the token
+    persistently. When the token expires we replace it in the database.
 
     :site: the site with which the token is associated
     :token: the authorization token

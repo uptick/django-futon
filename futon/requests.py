@@ -7,9 +7,8 @@ import logging
 import requests
 from requests_oauthlib import OAuth2Session
 from django.conf import settings
-from django.contrib.sites.models import Site
 
-from .models import Token
+from .models import Token, Site
 from .credentials import get_credentials
 
 __all__ = ['fetch', 'create', 'update']
