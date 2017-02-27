@@ -103,6 +103,13 @@ def execute(site, method, url, *args, **kwargs):
     reauth = kwargs.pop('reauth', False)
     hub = authorise(site, reauth)
     call = getattr(hub, method)
+
+    # Due to changes to the Oauth API we need to change
+    # any data requests to json.
+    data = kwargs.pop('data', None)
+    if data is not None:
+        kwargs['json'] = data
+
     response = call(url, *args, **kwargs)
 
     if response.status_code == 403 and not reauth:
