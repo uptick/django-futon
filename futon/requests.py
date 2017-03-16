@@ -112,7 +112,7 @@ def execute(site, method, url, *args, **kwargs):
 
     response = call(url, *args, **kwargs)
 
-    if response.status_code == 403 and not reauth:
+    if (response.status_code == 403 or response.status_code == 401) and not reauth:
         return execute(site, method, url, *args, reauth=True, **kwargs)
 
     return response
