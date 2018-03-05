@@ -24,7 +24,7 @@ class Token(models.Model):
     :token: the authorization token
     """
 
-    site = models.ForeignKey(Site, related_name='+')
+    site = models.ForeignKey(Site, related_name='+', on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
 
     def __str__(self):
