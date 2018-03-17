@@ -1,15 +1,16 @@
-import six
-import os
-import urllib.parse
-import threading
 import logging
-
+import os
 import requests
+import six
+import threading
+import urllib.parse
+
 from requests_oauthlib import OAuth2Session
+
 from django.conf import settings
 
-from .models import Token, Site
 from .credentials import get_credentials
+from .models import Site, Token
 
 __all__ = ['fetch', 'create', 'update']
 
@@ -151,3 +152,15 @@ def update(site, path, data, *args, **kwargs):
     """
     url = make_url(site, path)
     return execute(site, 'patch', url, data=data, **kwargs)
+
+
+def upsert(site, path, data, *args, **kwargs):
+    """PUT data to the server.
+
+    Performs a PUT to the server, authenticating the application if necessary.
+
+    :path: the endpoint to access
+    :data: the data to send
+    """
+    url = make_url(site, path)
+    return execute(site, 'put', url, data=data, **kwargs)

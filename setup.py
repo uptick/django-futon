@@ -1,9 +1,10 @@
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 setup(
     name='django-futon',
-    version='0.1.1',
+    version='0.1.3',
     author='Luke Hodkinson',
     author_email='furious.luke@gmail.com',
     maintainer='Luke Hodkinson',
