@@ -1,4 +1,6 @@
-# django-futon
+# Django-Futon
+
+[![PyPI version](https://badge.fury.io/py/django-futon.svg)](https://badge.fury.io/py/django-futon)
 
 
 ## Description
